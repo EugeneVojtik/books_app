@@ -23,10 +23,7 @@ class BookViewSet(ModelViewSet):
     serializer_class = BookSerializer
     queryset = Book.objects.all().annotate(
         annotated_likes=Count(Case(When(users_book__like=True, then=1))),
-        rating=Avg('users_book__rate'),
-        max_rating=Max("users_book__rate"),
-        min_rating=Min('users_book__rate'),
-        )
+        ).select_related('critic').prefetch_related('readers').order_by('id')
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     permission_classes = [IsOwnerOrStuffOrReadOnly]
     filter_fields = ["price"]
